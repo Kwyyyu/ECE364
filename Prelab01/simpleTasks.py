@@ -125,7 +125,7 @@ def findNames(nameList, part, name):
 
 def convertToBoolean(num, size):
     result = []
-    if isinstance(num, int):
+    if isinstance(num, int) and isinstance(size, int):
         list_num = []
         i = 0
         while num != 0 or i < size:
