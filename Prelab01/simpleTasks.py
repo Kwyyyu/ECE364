@@ -21,7 +21,7 @@ def find(pattern):
     for i in subseq:
         match = 1
         for index in range(len(pattern)):
-            if pattern[index] != 'x' and pattern[index] != i[index]:
+            if pattern[index] != 'X' and pattern[index] != i[index]:
                 match = 0
                 break
         if match == 1:
