@@ -134,4 +134,4 @@ def getCountOver(symbol, price):
 
 
 if __name__ == "__main__":
-    print(getCountOver("FB", 150))
+    print(getAveragePrice('AMZN', 2018),getCountOver('AMZN', 1000.0))
