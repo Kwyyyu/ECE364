@@ -13,8 +13,8 @@ def getMaxDifference(symbol):
     for root, dirs, files in os.walk('.'):
         name = symbol + ".dat"
         if name in files:
-            f = open(name, 'r')
-            contents = f.read()
+            with open(name, "r") as nFile:
+                contents = nFile.read()
             vmax = -1
             date = -1
             record_list = contents.split("\n")
@@ -34,8 +34,8 @@ def getGainPercent(symbol):
     for root, dirs, files in os.walk('.'):
         name = symbol + ".dat"
         if name in files:
-            f = open(name, 'r')
-            contents = f.read()
+            with open(name, "r") as nFile:
+                contents = nFile.read()
             sum = 0
             num = 0
             record_list = contents.split("\n")
@@ -55,8 +55,8 @@ def getVolumeSum(symbol, date1, date2):
     for root, dirs, files in os.walk('.'):
         name = symbol + ".dat"
         if name in files and date2 > date1:
-            f = open(name, 'r')
-            contents = f.read()
+            with open(name, "r") as nFile:
+                contents = nFile.read()
             vsum = 0
             flag = 0
             record_list = contents.split("\n")
@@ -80,8 +80,8 @@ def getBestGain(date):
         vmax = -1
         for j in files:
             if type in j:
-                f = open(j, 'r')
-                contents = f.read()
+                with open(j, "r") as nFile:
+                    contents = nFile.read()
                 record_list = contents.split("\n")
                 for i in range(2, len(record_list)):
                     if len(record_list[i]) > 1:
@@ -98,8 +98,8 @@ def getAveragePrice(symbol, year):
     for root, dirs, files in os.walk('.'):
         name = symbol + ".dat"
         if name in files:
-            f = open(name, 'r')
-            contents = f.read()
+            with open(name, "r") as nFile:
+                contents = nFile.read()
             vsum = 0
             sum = 0
             record_list = contents.split("\n")
@@ -119,8 +119,8 @@ def getCountOver(symbol, price):
     for root, dirs, files in os.walk('.'):
         name = symbol + ".dat"
         if name in files:
-            f = open(name, 'r')
-            contents = f.read()
+            with open(name, "r") as nFile:
+                contents = nFile.read()
             record_list = contents.split("\n")
             count = 0
             for i in range(2, len(record_list)):
@@ -134,4 +134,4 @@ def getCountOver(symbol, price):
 
 
 if __name__ == "__main__":
-    print(getAveragePrice('AMZN', 2018),getCountOver('AMZN', 1000.0))
+    print(getAveragePrice('AMZN', 2017),getBestGain("2017/01/11"))
