@@ -208,7 +208,6 @@ def getParticipationByProject(projectID):
         raise ValueError("Oops! No such project ID. Please check and try again...")
     else:
         circuit_id = project_map[projectID]
-        print(circuit_id)
         studentid_map = getStudentidMap()
         # go through the circuit files and find students
         for root, dirs, files in os.walk('./circuits/'):
@@ -219,7 +218,7 @@ def getParticipationByProject(projectID):
                     for j in range(len(contents)):
                         if contents[j].strip() in studentid_map.keys():
                             result.append(studentid_map[contents[j].strip()])
-        return set(result)
+    return set(result)
 
 
 def getCostOfProjects():
@@ -296,7 +295,7 @@ def getCommonByProject(projectID1, projectID2):
                                 parts.add(contents[k].strip())
             two_set.append(parts)
         result = two_set[0] & two_set[1]
-        return sorted(result)
+    return sorted(result)
 
 
 
@@ -346,6 +345,6 @@ def getCircuitByComponent(componentIDs):
 
 
 if __name__ == "__main__":
-    T = getCircuitByComponent({"PEC-560","LGO-374 ","UQC-346","TDP-854"})
+    T = getParticipationByProject("082D6241-40EE-432E-A635-65EA8AA374B6")
     #T = getCommonByProject("082D6241-40EE-432E-A635-65EA8AA374B6","77A1A82E-749E-43BF-B3BF-3E70F087F808")
     pprint(T)
