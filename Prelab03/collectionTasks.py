@@ -62,7 +62,6 @@ def getComponentCountByProject(projectID,componentsSymbol):
     # get the list of circuit
     project_map = getProjectMap()
     circuit = project_map[projectID]
-
     # with open("./maps/projects.dat", "r") as file:
     #     projects = file.readlines()
     # for i in range(2, len(projects)):
@@ -91,6 +90,7 @@ def getComponentCountByProject(projectID,componentsSymbol):
             if len(components[i]) > 1:
                 text = components[i].split()
                 parts.append(text[0])
+        print(len(parts))
 
         if len(circuit) > 0:
             result = 0
@@ -240,6 +240,7 @@ def getCostOfProjects():
                     for k in range(ind, len(contents)):
                         if len(contents[k]) > 0:
                             parts.append(contents[k].strip())
+
         for filename in ["resistors.dat", "capacitors.dat", "transistors.dat", "inductors.dat"]:
             with open("./maps/" + filename, "r") as file:
                 components = file.readlines()
@@ -345,6 +346,16 @@ def getCircuitByComponent(componentIDs):
 
 
 if __name__ == "__main__":
-    T = getParticipationByProject("082D6241-40EE-432E-A635-65EA8AA374B6")
+    # print("Problem 1:", getComponentCountByProject('082D6241-40EE-432E-A635-65EA8AA374B6', "R"))
+    # print("Problem 2:", getComponentCountByStudent("Brown, Robert", "T"))
+    # print(getParticipationByStudent("Adams, Keith"))
+    # print(len(getParticipationByProject('082D6241-40EE-432E-A635-65EA8AA374B6')))
+    # print(getCostOfProjects())
+    # print(len(getProjectByComponent({"HRK-348", "HLE-968", "ILP-016"})))
+    # print(len(getCommonByProject("082D6241-40EE-432E-A635-65EA8AA374B6", "90BE0D09-1438-414A-A38B-8309A49C02EF")))
+    #print(getComponentReport({"HRK-348", "HLE-968", "ILP-016", "GZT-093", "VCI-378", "LIT-491"}))
+    print(getCircuitByStudent({"Brown, Robert", "Adams, Keith"}))
+    print(getCircuitByComponent({"HRK-348", "HLE-968", "ILP-016"}))
+    #T = getParticipationByProject("082D6241-40EE-432E-A635-65EA8AA374B6")
     #T = getCommonByProject("082D6241-40EE-432E-A635-65EA8AA374B6","77A1A82E-749E-43BF-B3BF-3E70F087F808")
-    pprint(T)
+    #pprint(T)
