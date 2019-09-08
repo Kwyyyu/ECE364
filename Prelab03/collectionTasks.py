@@ -90,10 +90,10 @@ def getComponentCountByProject(projectID,componentsSymbol):
             if len(components[i]) > 1:
                 text = components[i].split()
                 parts.append(text[0])
-        print(len(parts))
 
         if len(circuit) > 0:
             result = 0
+            part_list = set()
             for root, dirs, files in os.walk('./circuits/'):
                 for i in circuit:
                     name = "circuit_" + i + ".dat"
@@ -102,7 +102,8 @@ def getComponentCountByProject(projectID,componentsSymbol):
                             contents = nFile.readlines()
                         for k in range(len(contents)):
                             if contents[k].strip() in parts:
-                                result += 1
+                                part_list.add(contents[k].strip())
+            result = len(part_list)
     if result == "":
         raise ValueError("Oops! No such project ID. Please check and try again...")
     return result
@@ -147,6 +148,7 @@ def getComponentCountByStudent(studentName,componentsSymbol):
                     text = components[i].split()
                     parts.append(text[0])
             # go through the circuits and find parts
+            part_list = set()
             for root, dirs, files in os.walk('./circuits/'):
                 for i in files:
                     with open('./circuits/' + i, "r") as nFile:
@@ -159,7 +161,8 @@ def getComponentCountByStudent(studentName,componentsSymbol):
                     if flag == 1:
                         for j in range(len(contents)):
                             if contents[j].strip() in parts:
-                                result += 1
+                                part_list.add(contents[j].strip())
+            result = len(part_list)
     return result
     # try:
     #     return int(result)
@@ -224,8 +227,17 @@ def getParticipationByProject(projectID):
 def getCostOfProjects():
     project_list = list(getProjectMap().keys())
     cost_map = {}
+    part_map = {}
+    # get all the components map
+    for filename in ["resistors.dat", "capacitors.dat", "transistors.dat", "inductors.dat"]:
+        with open("./maps/" + filename, "r") as file:
+            components = file.readlines()
+        for j in range(3, len(components)):
+            if len(components[j]) > 1:
+                text = components[j].split()
+                part_map[text[0]] = text[1]
+
     for i in project_list:
-        parts = []
         result = 0.00
         circuits = getProjectMap()[i]
         for root, dirs, files in os.walk('./circuits/'):
@@ -233,28 +245,16 @@ def getCostOfProjects():
                 if j[8:len(j)-4] in circuits:
                     with open('./circuits/' + j, "r") as nFile:
                         contents = nFile.readlines()
-                    ind = 0
                     for k in range(len(contents)):
-                        if "Components" in contents[k]:
-                            ind = k + 2
-                    for k in range(ind, len(contents)):
                         if len(contents[k]) > 0:
-                            parts.append(contents[k].strip())
-
-        for filename in ["resistors.dat", "capacitors.dat", "transistors.dat", "inductors.dat"]:
-            with open("./maps/" + filename, "r") as file:
-                components = file.readlines()
-            for j in range(3, len(components)):
-                if len(components[j]) > 1:
-                    text = components[j].split()
-                    if text[0] in parts:
-                        price = text[1]
-                        result += float(price[1:])
-        cost_map[i] = "{0:.2f}".format(result)
+                            if contents[k].strip() in part_map.keys():
+                                price = part_map[contents[k].strip()]
+                                result += float(price[1:])
+        cost_map[i] = round(result, 2)
     return cost_map
 
 
-def  getProjectByComponent(componentIDs):
+def getProjectByComponent(componentIDs):
     result = {}
     circuit_list = []
     project_list = []
@@ -276,9 +276,18 @@ def  getProjectByComponent(componentIDs):
 def getCommonByProject(projectID1, projectID2):
     project_map = getProjectMap()
     two_set = []
+    part_map = {}
     if projectID1 not in project_map.keys():
         raise ValueError("Oops! No such project ID. Please check and try again...")
     else:
+        # get all the components map
+        for filename in ["resistors.dat", "capacitors.dat", "transistors.dat", "inductors.dat"]:
+            with open("./maps/" + filename, "r") as file:
+                components = file.readlines()
+            for j in range(3, len(components)):
+                if len(components[j]) > 1:
+                    text = components[j].split()
+                    part_map[text[0]] = text[1]
         for i in [projectID1, projectID2]:
             parts = set()
             circuit_list = getProjectMap()[i]
@@ -287,17 +296,12 @@ def getCommonByProject(projectID1, projectID2):
                     if j[8:len(j) - 4] in circuit_list:
                         with open('./circuits/' + j, "r") as nFile:
                             contents = nFile.readlines()
-                        ind = 0
                         for k in range(len(contents)):
-                            if "Components" in contents[k]:
-                                ind = k + 2
-                        for k in range(ind, len(contents)):
-                            if len(contents[k]) > 0:
+                            if len(contents[k]) > 0 and contents[k].strip() in part_map.keys():
                                 parts.add(contents[k].strip())
             two_set.append(parts)
         result = two_set[0] & two_set[1]
     return sorted(result)
-
 
 
 def getComponentReport(componentIDs):
@@ -346,16 +350,13 @@ def getCircuitByComponent(componentIDs):
 
 
 if __name__ == "__main__":
-    # print("Problem 1:", getComponentCountByProject('082D6241-40EE-432E-A635-65EA8AA374B6', "R"))
-    # print("Problem 2:", getComponentCountByStudent("Brown, Robert", "T"))
-    # print(getParticipationByStudent("Adams, Keith"))
-    # print(len(getParticipationByProject('082D6241-40EE-432E-A635-65EA8AA374B6')))
-    # print(getCostOfProjects())
-    # print(len(getProjectByComponent({"HRK-348", "HLE-968", "ILP-016"})))
-    # print(len(getCommonByProject("082D6241-40EE-432E-A635-65EA8AA374B6", "90BE0D09-1438-414A-A38B-8309A49C02EF")))
-    #print(getComponentReport({"HRK-348", "HLE-968", "ILP-016", "GZT-093", "VCI-378", "LIT-491"}))
+    print("Problem 1:", getComponentCountByProject('082D6241-40EE-432E-A635-65EA8AA374B6', "R"))
+    print("Problem 2:", getComponentCountByStudent("Brown, Robert", "T"))
+    print(getParticipationByStudent("Adams, Keith"))
+    print(getParticipationByProject('082D6241-40EE-432E-A635-65EA8AA374B6'))
+    print(getCostOfProjects())
+    print(getProjectByComponent({"HRK-348", "HLE-968", "ILP-016"}))
+    print(getCommonByProject("082D6241-40EE-432E-A635-65EA8AA374B6", "90BE0D09-1438-414A-A38B-8309A49C02EF"))
+    print(getComponentReport({"HRK-348", "HLE-968", "ILP-016", "GZT-093", "VCI-378", "LIT-491"}))
     print(getCircuitByStudent({"Brown, Robert", "Adams, Keith"}))
     print(getCircuitByComponent({"HRK-348", "HLE-968", "ILP-016"}))
-    #T = getParticipationByProject("082D6241-40EE-432E-A635-65EA8AA374B6")
-    #T = getCommonByProject("082D6241-40EE-432E-A635-65EA8AA374B6","77A1A82E-749E-43BF-B3BF-3E70F087F808")
-    #pprint(T)
