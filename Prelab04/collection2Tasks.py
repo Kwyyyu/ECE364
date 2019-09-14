@@ -80,6 +80,7 @@ def getTechWork(techName:str) -> dict:
     virus used in all his experiments. '''
     tech_map = getTechMap()
     report_map = getReportMap()
+    virus_id_map = getVirusIdMap()
     tech_id = tech_map[techName]
     final_map = defaultdict(int)
     if tech_id in report_map.keys():
@@ -89,7 +90,8 @@ def getTechWork(techName:str) -> dict:
                 virus_list = file.readlines()
             for vlist in virus_list[4:]:
                 if len(vlist) > 0:
-                    virus_name = vlist.split()[1]
+                    virus_id = vlist.split()[1]
+                    virus_name = virus_id_map[virus_id][0]
                     units = vlist.split()[2]
                     final_map[virus_name] += int(units)
     final_map = {k: v for k, v in final_map.items()}
@@ -187,9 +189,9 @@ def getUnusedStrains() -> set:
 
 
 if __name__ == "__main__":
-    # pprint(getTechWork("Turner, Theresa"))
-    # pprint(getStrainConsumption("Cardiovirus"))
+    pprint(getTechWork("Turner, Theresa"))
+    # pprint(getStrainConsumption("Adenoviridae"))
     # pprint(getTechSpending())
     # pprint(getStrainCost())
     # pprint(getAbsentTechs())
-    pprint(getUnusedStrains())
+    # pprint(getUnusedStrains())
