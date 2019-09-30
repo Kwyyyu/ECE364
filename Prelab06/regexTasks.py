@@ -38,15 +38,17 @@ def getSpecial(sentence: str, letter: str) -> list:
 
 def getRealMAC(sentence: str):
     """Take in a sentence, if it contains a MAC address, return the address, else return None"""
-    match1 = re.search(r'\b[0-9A-Fa-f]{2}[-:]{1}[0-9A-Fa-f]{2}[-:]{1}[0-9A-Fa-f]{2}[-:]{1}[0-9A-Fa-f]{2}[-:]{1}[0-9A-Fa-f]{2}[-:]{1}[0-9A-Fa-f]{2}\b', sentence)
+    match1 = re.search(r'\b([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\b', sentence)
     if match1:
-        return match1.group()
+        endpoint = match1.span()[1]
+        if sentence[endpoint] is not ":" and sentence[endpoint] is not "-":
+            return match1.group()
     else:
         return None
 
 
 @functools.lru_cache()
-def getNameMap()-> dict:
+def getNameMap() -> dict:
     """A map where the key is the employee's name, the value is a tuple of their uuid, phone number and state"""
     final_map = {}
     with open("Employees.dat", "r") as nFile:
@@ -149,7 +151,7 @@ if __name__ == "__main__":
     # print(getUrlParts("http://www.purdue.edu/Home/Calendar?Year=2016&Month=September&Semester=Fall"))
     # print(getQueryParameters("http://www.google.com/Math/Const?Pi=3.14&Max_Int=65536&What_Else=Not-Here"))
     # print(getSpecial("The TART program runs on Tuesdays and Thursdays, but it does not start until next week.", "t"))
-    print(getRealMAC("This is a mac address: 58:1C:0A:6E:39:4D for test"))
+    print(getRealMAC("58:1C:0A:6E:39:4D for test"))
     # (getNameMap())
     # pp(getRejectedEntries())
     # pp(getEmployeesWithIDs())
