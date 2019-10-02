@@ -57,8 +57,11 @@ def getNameMap() -> dict:
         reg1 = r'[A-Za-z]+[,]?[ A-Za-z]+'
         name = re.search(reg1, record).group()
         if "," in name:
-            last_name, first_name = name.split(",")
-            name = first_name[1:] + " " + last_name
+            index = re.search(r',', name)
+            ind = index.span()[0]
+            l_name = name[:ind]
+            f_name = name[ind+2:]
+            name = f_name + " " + l_name
         reg2 = r'[0-9A-Fa-f]{8}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{12}'
         uuid = re.search(reg2, record).group() if re.search(reg2, record) else None
         if uuid is not None:
@@ -151,8 +154,8 @@ if __name__ == "__main__":
     # print(getUrlParts("http://www.purdue.edu/Home/Calendar?Year=2016&Month=September&Semester=Fall"))
     # print(getQueryParameters("http://www.google.com/Math/Const?Pi=3.14&Max_Int=65536&What_Else=Not-Here"))
     # print(getSpecial("The TART program runs on Tuesdays and Thursdays, but it does not start until next week.", "t"))
-    print(getRealMAC("58:1C:0A:6E:39:4D for test"))
-    # (getNameMap())
+    # print(getRealMAC("58:1C:0A:6E:39:4D for test"))
+    (getNameMap())
     # pp(getRejectedEntries())
     # pp(getEmployeesWithIDs())
     # pp(getEmployeesWithoutIDs())
