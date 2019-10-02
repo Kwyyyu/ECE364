@@ -13,6 +13,7 @@ from collections import defaultdict
 def getTechMap() -> dict:
     ''' A dictionary where the key is the technician's name, the value is the ID. '''
     tech_map = {}
+    tech_id_map = {}
     with open("./maps/technicians.dat", "r") as file:
         tech_list = file.readlines()
     for tech_record in tech_list[2:]:
@@ -21,6 +22,7 @@ def getTechMap() -> dict:
             tech_name = temp_record[0]+" "+temp_record[1]
             tech_id = temp_record[3]
             tech_map[tech_name] = tech_id
+            tech_id_map[tech_id] = tech_name
     return tech_map
 
 
@@ -111,7 +113,7 @@ def getStrainConsumption(virusName:str) -> dict:
         user_id = report_list[0].split()[2]
         user_name = tech_id_map[user_id]
         for record in report_list[4:]:
-            if record.split()[1] == virus_id:
+            if record.split()[1] is virus_id:
                 unit = int(record.split()[2])
                 final_map[user_name] += unit
     final_map = {k: v for k, v in final_map.items()}
