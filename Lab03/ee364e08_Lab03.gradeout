@@ -1,0 +1,15 @@
+/home/ecegridfs/a/ee364ta/grading/Lab03/ee364e08
+
+----------------------------------------------------------------------------
+FUNCTION          | DESCRIPTION       | COMMENTS                 | POINTS  
+----------------------------------------------------------------------------
+getGainPercent      Entry Count         Passed                     3/3     
+getGainPercent      Set Check           Passed                     7/7     
+getMonthlyVolume    Dictionary Check    Passed                     4/4     
+getMonthlyVolume    Entry Check         Passed                     3/3     
+getMonthlyVolume    Entry Count         Passed                     3/3     
+getNamesBySymbol    Dictionary Check    FAILED                     0/7     
+getNamesBySymbol    Entry Count         Passed                     3/3     
+----------------------------------------------------------------------------
+
+Total Score = 23.0

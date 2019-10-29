@@ -1,0 +1,91 @@
+#######################################################
+#   Author:     <Kaiwen Yu>
+#   email:      <yu872@purdue.edu>
+#   ID:         <ee364e08>
+#   Date:       <10/2/2019>
+#######################################################
+
+import re
+from pprint import pprint as pp
+
+def getGenres():
+    with open("books.xml", "r") as nFile:
+        content = nFile.read()
+    pattern = r'<genre>(?P<genre>.+)</genre>'
+    match = re.findall(pattern, content)
+    return sorted(match)
+
+
+def getAuthorOf(bookName):
+    with open("books.xml", "r") as nFile:
+        content = nFile.read()
+    pattern = r'<author>(?P<author>.+)</author>[\n ]*<title>'+bookName+r'</title>'
+    match = re.search(pattern, content)
+    if match is None:
+        return None
+    else:
+        author = match["author"]
+        return author
+
+
+def getBookInfo(bookID):
+    with open("books.xml", "r") as nFile:
+        content = nFile.read()
+    pattern = r"<book id=\"" + bookID + r"\">[\n ]*<author>(?P<author>.+)</author>[\n ]*<title>(?P<title>.+)</title>"
+    match = re.search(pattern, content)
+    if match is None:
+        return None
+    else:
+        author = match["author"]
+        title = match["title"]
+        return title, author
+
+
+def getBooksBy(authorName):
+    with open("books.xml", "r") as nFile:
+        content = nFile.read()
+    final_list = []
+    pattern = r'<author>' + authorName+'</author>[\n ]*<title>(?P<title>.+)</title>'
+    match = re.findall(pattern, content)
+    if match:
+        final_list = sorted(match)
+    return sorted(final_list)
+
+
+def getBooksBelow(bookPrice):
+    with open("books.xml", "r") as nFile:
+        content = nFile.read()
+    final_list = []
+    pattern = r'<title>(?P<title>.+)</title>[\n ]*<genre>.+</genre>[\n ]*<price>(?P<price>.+)</price>'
+    match = re.findall(pattern, content)
+    for record in match:
+        title, price = record
+        if float(price) < bookPrice:
+            final_list.append(title)
+    return sorted(final_list)
+
+
+def searchForWord(word):
+    final_list = []
+    with open("books.xml", "r") as nFile:
+        content = nFile.read()
+    pattern = r'<title>(?P<title>.+)</title>[\n ]*<genre>.+</genre>[\n ]*<price>.+</price>[\n ]*<publish_date>.+</publish_date>[\n ]*<description>(?P<desc>.+)</description>'
+    match = re.findall(pattern, content)
+    for record in match:
+        title, desc = record
+        pattern2 = r'\b'+word+r'\b'
+        match2 = re.search(pattern2, title)
+        match3 = re.search(pattern2, desc)
+        if match2 or match3:
+            final_list.append(title)
+    return sorted(final_list)
+
+
+
+if __name__ == "__main__":
+    # pp(getGenres())
+    # pp(getAuthorOf("Microsoft .NET: The Programming Bible"))
+    # pp(getBookInfo("bk112"))
+    # pp(getBooksBy("Corets, Eva"))
+    # pp(getBooksBelow(12.5))
+    pp(searchForWord("of"))

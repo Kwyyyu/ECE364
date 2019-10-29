@@ -1,0 +1,14 @@
+/home/ecegridfs/a/ee364ta/grading/Lab01/ee364e08
+
+----------------------------------------------------------------------------
+FUNCTION         | DESCRIPTION        | COMMENTS                 | POINTS  
+----------------------------------------------------------------------------
+calculateChain                          Passed                     10/10   
+calculateTensor    Product 1            Error running function     0/5     
+calculateTensor    Product 2            Error running function     0/5     
+isNotHardcoded     Longest Chain        Passed                     0/0     
+isNotHardcoded     Smallest Permuted    Passed                     0/0     
+searchForNumber                         Passed                     10/10   
+----------------------------------------------------------------------------
+
+Total Score = 20.0

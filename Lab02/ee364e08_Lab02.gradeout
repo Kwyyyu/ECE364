@@ -1,0 +1,13 @@
+/home/ecegridfs/a/ee364ta/grading/Lab02/ee364e08
+
+--------------------------------------------------------------------------
+FUNCTION          | DESCRIPTION     | COMMENTS                 | POINTS  
+--------------------------------------------------------------------------
+getCodeFor          Value I           Passed                     5/5     
+getCodeFor          Value II          Passed                     5/5     
+getLeastFrequent    LeastFrequent     Passed                     10/10   
+getSubMatrixSum                       Passed                     10/10   
+isNotHardcoded      Least Frequent    Passed                     0/0     
+--------------------------------------------------------------------------
+
+Total Score = 30.0

@@ -1,0 +1,22 @@
+/home/ecegridfs/a/ee364ta/grading/Lab07/ee364e08
+
+-----------------------------------------------------------------------------------
+FUNCTION                  | DESCRIPTION      | COMMENTS                 | POINTS  
+-----------------------------------------------------------------------------------
+Circle                      invalid input      Passed                     1/1     
+Circle                      valid input        Passed                     1/1     
+Circle_intersectsWith       Circle False       Passed                     2/2     
+Circle_intersectsWith       Circle True        Passed                     2/2     
+Circle_intersectsWith       Rectangle False    Passed                     2/2     
+Circle_intersectsWith       Rectangle True     Passed                     2/2     
+Rectangle                   invalid input      Passed                     2/2     
+Rectangle                   valid input        Passed                     3/3     
+Rectangle_Equality          invalid input      Passed                     2.5/2.5 
+Rectangle_Equality          true               Passed                     2.5/2.5 
+Rectangle_intersectsWith    false              Passed                     2.5/2.5 
+Rectangle_intersectsWith    true               Passed                     2.5/2.5 
+Rectangle_isSquare          false              Passed                     2.5/2.5 
+Rectangle_isSquare          true               Passed                     2.5/2.5 
+-----------------------------------------------------------------------------------
+
+Total Score = 30.0

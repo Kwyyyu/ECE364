@@ -1,0 +1,35 @@
+/home/ecegridfs/a/ee364ta/grading/Lab05/ee364e08
+
+---------------------------------------------------------------------------------------
+FUNCTION             | DESCRIPTION               | COMMENTS                 | POINTS  
+---------------------------------------------------------------------------------------
+getBounds              Entry Count                 Passed                     5/5     
+getBounds              Full Dictionary             Passed                     5/5     
+getBounds              Sample Signal               Passed                     5/5     
+getCarsFor             Set 1                       Passed                     5/5     
+getCarsFor             Set 2                       Passed                     5/5     
+getCarsFor             Set 3                       Passed                     5/5     
+getCommonDriversFor    Group 1                     FAILED                     0/5     
+getCommonDriversFor    Group 2                     FAILED                     0/5     
+getCommonDriversFor    Group 3                     FAILED                     0/5     
+getDriversFor          Bad ID                      Passed                     2/2     
+getDriversFor          ID 1                        FAILED                     0/4     
+getDriversFor          ID 2                        FAILED                     0/4     
+getDuration            Duration 1, Full Map        Passed                     5/5     
+getDuration            Duration 1, Value Counts    Passed                     5/5     
+getDuration            Duration 2, Full Map        Passed                     5/5     
+getDuration            Duration 2, Value Counts    Passed                     5/5     
+getLargest             Group 1                     Error running function     0/2.5   
+getLargest             Group 2                     Error running function     0/2.5   
+getLargest             Group 3                     Error running function     0/2.5   
+getLargest             Group 4                     Error running function     0/2.5   
+getSampled             Bad Signal                  Passed                     1/1     
+getSampled             Signal 1                    Passed                     7/7     
+getSampled             Signal 2                    Passed                     7/7     
+getValueAt             Sample 1                    Passed                     2.5/2.5 
+getValueAt             Sample 2                    Passed                     2.5/2.5 
+getValueAt             Sample 3                    Passed                     2.5/2.5 
+getValueAt             Sample 4                    Passed                     2.5/2.5 
+---------------------------------------------------------------------------------------
+
+Total Score = 77.0

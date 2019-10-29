@@ -1,0 +1,55 @@
+/home/ecegridfs/a/ee364ta/grading/Lab06/ee364e08
+
+[("XML Developer's Guide",
+  'An in-depth look at creating applications with XML.'),
+ ('Maeve Ascendant',
+  'After the collapse of a nanotechnology society in England, the young '
+  'survivors lay the foundation for a new society.'),
+ ('The Sundered Grail',
+  'The two daughters of Maeve, half-sisters, battle one another for control of '
+  "England. Sequel to Oberon's Legacy."),
+ ('Splish Splash',
+  'A deep sea diver finds true love twenty thousand leagues beneath the sea.'),
+ ('Paradox Lost',
+  'After an inadvertant trip through a HeisenbergUncertainty Device, James '
+  'Salway discovers the problems of being quantum.'),
+ ('MSXML3: A Comprehensive Guide',
+  'The Microsoft MSXML3 parser is covered in detail, with attention to XML DOM '
+  'interfaces, XSLT processing, SAX and more.')]
+[("XML Developer's Guide",
+  'An in-depth look at creating applications with XML.'),
+ ('Maeve Ascendant',
+  'After the collapse of a nanotechnology society in England, the young '
+  'survivors lay the foundation for a new society.'),
+ ('The Sundered Grail',
+  'The two daughters of Maeve, half-sisters, battle one another for control of '
+  "England. Sequel to Oberon's Legacy."),
+ ('Splish Splash',
+  'A deep sea diver finds true love twenty thousand leagues beneath the sea.'),
+ ('Paradox Lost',
+  'After an inadvertant trip through a HeisenbergUncertainty Device, James '
+  'Salway discovers the problems of being quantum.'),
+ ('MSXML3: A Comprehensive Guide',
+  'The Microsoft MSXML3 parser is covered in detail, with attention to XML DOM '
+  'interfaces, XSLT processing, SAX and more.')]
+----------------------------------------------------------------------------
+FUNCTION       | DESCRIPTION          | COMMENTS                 | POINTS  
+----------------------------------------------------------------------------
+getAuthorOf      Book 1 Test            Passed                     2/2     
+getAuthorOf      Book 2 Test            Passed                     2/2     
+getAuthorOf      Invalid Book Test      Passed                     1/1     
+getBookInfo      Book 1 Test            Passed                     2/2     
+getBookInfo      Book 2 Test            Passed                     2/2     
+getBookInfo      Invalid Book Test      Passed                     1/1     
+getBooksBelow    Invalid Price Test     Passed                     1/1     
+getBooksBelow    Valid Price Test       Passed                     4/4     
+getBooksBy       Author 1 Test          Passed                     2/2     
+getBooksBy       Author 2 Test          Passed                     2/2     
+getBooksBy       Invalid Author Test    Passed                     1/1     
+getGenres                               FAILED                     0/5     
+searchForWord    Invalid Word Test      FAILED                     0/1     
+searchForWord    Word 1 Test            FAILED                     0/2     
+searchForWord    Word 2 Test            FAILED                     0/2     
+----------------------------------------------------------------------------
+
+Total Score = 20.0
