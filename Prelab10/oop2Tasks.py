@@ -7,7 +7,10 @@
 
 import math
 import copy
-import _collections_abc
+import collections
+import enum
+import numpy
+
 
 class Datum:
 
@@ -221,6 +224,120 @@ class Datum:
         return self.__eq__(other) or self.__gt__(other)
 
 
+class Data(collections.UserList):
+
+    def __init__(self, dlist):
+        for item in dlist:
+            if not isinstance(item, Datum):
+                raise TypeError("One of the inputs is not an instance of Datum type!")
+        if dlist is None:
+            initial = []
+        else:
+            initial = dlist
+        super().__init__(initial)
+
+    def computeBounds(self):
+        minDatum = Datum()
+        maxDatum = Datum()
+        length = 0
+        for item in self:
+            if len(item) > length:
+                length = len(item)
+        minlist = [0]*length
+        maxlist = [0]*length
+        for item in self:
+            for index in range(len(item)):
+                if item[index] > maxlist[index]:
+                    maxlist[index] = item[index]
+                if item[index] < minlist[index]:
+                    minlist[index] = item[index]
+        minDatum._storage = minlist
+        maxDatum._storage = maxlist
+        return minDatum, maxDatum
+
+    def computeMean(self):
+        meanDatum = Datum()
+        length = 0
+        for item in self:
+            if len(item) > length:
+                length = len(item)
+        sumlist = [0] * length
+        for item in self:
+            for index in range(len(item)):
+                sumlist[index] += item[index]
+        meanlist = numpy.array(sumlist)
+        meanlist = list(meanlist/length)
+        meanDatum._storage = meanlist
+        return meanDatum
+
+    def append(self, item: Datum) -> None:
+        if not isinstance(item, Datum):
+            raise TypeError("Input is not an instance of Datum type!")
+        super().append(item)
+
+    def count(self, item: Datum) -> int:
+        if not isinstance(item, Datum):
+            raise TypeError("Input is not an instance of Datum type!")
+        result = super().count(item)
+        return result
+
+    def index(self, item: Datum, *args) -> int:
+        if not isinstance(item, Datum):
+            raise TypeError("Input is not an instance of Datum type!")
+        result = super().index(item, *args)
+        return result
+
+    def insert(self, i: int, item: Datum) -> None:
+        if not isinstance(item, Datum):
+            raise TypeError("Input is not an instance of Datum type!")
+        super().insert(i,item)
+
+    def remove(self, item: Datum) -> None:
+        if not isinstance(item, Datum):
+            raise TypeError("Input is not an instance of Datum type!")
+        super().remove(item)
+
+    def __setitem__(self, key, value):
+        if not isinstance(value, Datum):
+            raise TypeError("Input is not an instance of Datum type!")
+        super().__setitem__(key, value)
+
+    def extend(self, other) -> None:
+        if not isinstance(other, Data):
+            raise TypeError("Input is not an instance of Data type!")
+        super().extend(other)
+
+
+class DataClass(enum.Enum):
+    Class1 = "Class1"
+    Class2 = "Class2"
+
+
+class DataClassifier:
+
+    def __init__(self, group1, group2):
+        if not isinstance(group1, Data):
+            raise TypeError("First input is not an instances of Data type!")
+        if not isinstance(group2, Data):
+            raise TypeError("Second input is not an instances of Data type!")
+        if len(group1) == 0:
+            raise ValueError("First input empty!")
+        if len(group2) == 0:
+            raise ValueError("Second input empty!")
+        self._class1 = group1
+        self._class2 = group2
+
+    def classify(self, item: Datum):
+        mean1 = self._class1.computeMean()
+        mean2 = self._class2.computeMean()
+        dis1 = mean1.distanceFrom(item)
+        dis2 = mean2.distanceFrom(item)
+        if dis1 <= dis2:
+            return DataClass.Class1
+        else:
+            return DataClass.Class2
+
+
 if __name__ == "__main__":
     d1 = Datum(1.234, 5.341, 12, 1.007)
     print(d1)
@@ -302,3 +419,19 @@ if __name__ == "__main__":
     print(d3)
     print(d1 > d3)
     print(d1 >= d3)
+
+    print()
+    print("Test computeBound function:")
+    list1 = [d1, d2, d3]
+    data1 = Data(list1)
+    print(data1.computeBounds())
+
+    print()
+    print("Test computeMean function:")
+    print(data1.computeMean())
+
+    data2 = Data([d1, d3, d4])
+    dc1 = DataClassifier(data1, data2)
+    print(dc1.classify(d1))
+
+
