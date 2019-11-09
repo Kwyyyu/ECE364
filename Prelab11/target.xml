@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Content>
+    <StudentName graduate="false">Kaiwen Yu</StudentName>
+    <StudentID>00311</StudentID>
+    <College>Computer Engineering</College>
+    <Components>
+		<Component name="dfgdf" count="1" />
+		<Component name="sfgft" count="2" />
+		<Component name="ukjjtftgd" count="45" />
+    </Components>
+</Content>

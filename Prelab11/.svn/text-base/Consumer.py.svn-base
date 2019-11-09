@@ -1,0 +1,67 @@
+
+#######################################################
+#   Author:     <Your Full Name>
+#   email:      <Your Email>
+#   ID:         <Your course ID, e.g. ee364j20>
+#   Date:       <Start Date>
+#######################################################
+
+import sys
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
+from BasicUI import *
+
+
+class Consumer(QMainWindow, Ui_MainWindow):
+
+    def __init__(self, parent=None):
+
+        super(Consumer, self).__init__(parent)
+        self.setupUi(self)
+        self.btnSave.setDisabled(True)
+        self.btnClear.clicked.connect(self.clearAll)
+
+    def loadData(self):
+        """
+        *** DO NOT MODIFY THIS METHOD! ***
+        Obtain a file name from a file dialog, and pass it on to the loading method. This is to facilitate automated
+        testing. Invoke this method when clicking on the 'load' button.
+
+        You must modify the method below.
+        """
+        filePath, _ = QFileDialog.getOpenFileName(self, caption='Open XML file ...', filter="XML files (*.xml)")
+
+        if not filePath:
+            return
+
+        self.loadDataFromFile(filePath)
+
+    def loadDataFromFile(self, filePath):
+        """
+        Handles the loading of the data from the given file name. This method will be invoked by the 'loadData' method.
+        
+        *** YOU MUST USE THIS METHOD TO LOAD DATA FILES. ***
+        *** This method is required for unit tests! ***
+        """
+        pass
+
+    def clearAll(self):
+        for widget in QApplication.allWidgets():
+            if widget.__class__ is QtWidgets.QLineEdit:
+                widget.clear()
+        self.chkGraduate.setChecked(False)
+        self.cboCollege.setCurrentIndex(0)
+        self.btnSave.setDisabled(True)
+        self.btnLoad.setDisabled(False)
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    currentApp = QApplication(sys.argv)
+    currentForm = Consumer()
+
+    currentForm.show()
+    currentApp.exec_()
