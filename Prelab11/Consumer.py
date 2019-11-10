@@ -9,7 +9,7 @@
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
 from BasicUI import *
-from pprint import pprint as pp
+import re
 
 
 class Consumer(QMainWindow, Ui_MainWindow):
@@ -26,6 +26,7 @@ class Consumer(QMainWindow, Ui_MainWindow):
         self.cboCollege.currentIndexChanged.connect(self.dataEntry)
         self.chkGraduate.stateChanged.connect(self.dataEntry)
         self.btnSave.clicked.connect(self.dataSave)
+        self.btnLoad.clicked.connect(self.loadData)
 
     def loadData(self):
         """
@@ -49,6 +50,35 @@ class Consumer(QMainWindow, Ui_MainWindow):
         *** YOU MUST USE THIS METHOD TO LOAD DATA FILES. ***
         *** This method is required for unit tests! ***
         """
+        with open(filePath, "r") as f:
+            contents = f.read().replace("\n", "")
+
+        p_name = r'<StudentName graduate="(?P<graduate>[\w]+)">(?P<name>[\w\W]+)</StudentName>'
+        match = re.search(p_name, contents)
+        self.txtStudentName.setText(match["name"])
+        if match["graduate"] == "true":
+            self.chkGraduate.setChecked(True)
+        else:
+            self.chkGraduate.setChecked(False)
+        p_ID = r'<StudentID>(?P<ID>[\w\W]+)</StudentID>'
+        match = re.search(p_ID, contents)
+        self.txtStudentID.setText(match["ID"])
+        p_college = r'<College>(?P<college>[\w ]+)</College>'
+        match = re.search(p_college, contents)
+        self.cboCollege.setCurrentText(match["college"])
+        p_comp = r'<Component name="(?P<comp_name>[^"]+)" count="(?P<comp_count>[\d]+)" />'
+        match = re.findall(p_comp, contents)
+        length = 20
+        if len(match) < 20:
+            length = len(match)
+        for index in range(length):
+            c_name = "txtComponentName_" + str(index+1)
+            c_count = "txtComponentCount_" + str(index+1)
+            for widget in QApplication.allWidgets():
+                if widget.objectName() == c_name:
+                    widget.setText(match[index][0])
+                elif widget.objectName() == c_count:
+                    widget.setText(match[index][1])
         pass
 
     def clearAll(self):
@@ -66,9 +96,9 @@ class Consumer(QMainWindow, Ui_MainWindow):
 
     def dataSave(self):
         grad = "false"
-        if self.chkGraduate.isChecked is True:
+        if self.chkGraduate.isChecked() is True:
             grad = "true"
-        name_dic={}
+        name_dic = {}
         c_list = []
         for widget in QApplication.allWidgets():
             if widget.__class__ is QtWidgets.QLineEdit:
@@ -94,19 +124,8 @@ class Consumer(QMainWindow, Ui_MainWindow):
 %(content)s
     </Components>
 </Content>"""
-        #print(template%data)
         with open("target.xml", "w") as f:
             f.write(template % data)
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
