@@ -42,7 +42,7 @@ def loadTriangles(leftPointFilePath, rightPointFilePath):
         new_rightarray = np.array(r_pair, dtype=np.float64)
         new_righttri = Triangle(new_rightarray)
         tri_rightlist.append(new_righttri)
-        print(new_lefttri, new_righttri)
+        # print(new_lefttri, new_righttri)
 
     return tri_leftlist, tri_rightlist
 
@@ -90,10 +90,39 @@ class Triangle:
         return np.array(final_list, dtype=np.float64)
 
 
+class Morpher:
+    def __init__(self, leftImage: np.array, leftTriangles, rightImage: np.array, rightTriangles):
+        if leftImage.dtype is not np.dtype("uint8"):
+            raise TypeError("LeftImage shoule be a numpy array of uniy8 type.")
+        for triangle in leftTriangles:
+            if not isinstance(triangle, Triangle):
+                raise TypeError("LeftTriangles should be a list of Triangle instances.")
+        if rightImage.dtype is not np.dtype("uint8"):
+            raise TypeError("RightImage shoule be a numpy array of uniy8 type.")
+        for triangle in rightTriangles:
+            if not isinstance(triangle, Triangle):
+                raise TypeError("RightTriangles should be a list of Triangle instances.")
+        self.leftImage = leftImage
+        self.leftTriangles = leftTriangles
+        self.rightImage = rightImage
+        self.rightTriangles = rightTriangles
 
-
-# class Morpher:
-#     def __init__(self):
+    def getImageAtAlpha(self, alpha: float):
+        if alpha == 0:
+            return self.leftImage
+        elif alpha == 1:
+            return self.rightImage
+        else:
+            targetTriangles = []
+            for index in range(len(self.leftTriangles)):
+                left = self.leftTriangles[index]
+                right = self.rightTriangles[index]
+                tar_vertice = left.vertices*(1-alpha)+right.vertices*alpha
+                tar_tri = Triangle(tar_vertice)
+                print("left: ", left)
+                print("right: ", right)
+                print("target: ", tar_tri)
+                targetTriangles.append(tar_tri)
 
 
 
@@ -102,10 +131,13 @@ class Triangle:
 if __name__ == "__main__":
     vertice = np.array([[1, 2], [5, 7], [0, 4]], dtype=np.float64)
     t1 = Triangle(vertice)
-    # print(t1.getPoints())
+    print(t1.getPoints())
     leftpath = "./points.left.txt"
     rightpath = "./points.right.txt"
-    loadTriangles(leftpath, rightpath)
+    leftTri, rightTri = loadTriangles(leftpath, rightpath)
+    test = np.array([[1, 2], [5, 7], [0, 4]], dtype=np.uint8)
+    m = Morpher(test, leftTri, test, rightTri)
+    m.getImageAtAlpha(0.5)
 
 
 
