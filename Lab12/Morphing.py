@@ -128,23 +128,20 @@ class Morpher:
         else:
             m, n = self.leftImage.shape
             # m: 1080 n: 1440 m is the row and n is the col
-            # print(m, n)
             # x is col and y is row
             x = np.arange(n)
             y = np.arange(m)
-            f_left = interpolate.interp2d(x, y, self.leftImage)
-            f_right = interpolate.interp2d(x, y, self.rightImage)
+            # f_left = interpolate.interp2d(x, y, self.leftImage)
+            # f_right = interpolate.interp2d(x, y, self.rightImage)
+            f_left = interpolate.RectBivariateSpline(y, x, self.leftImage)
+            f_right = interpolate.RectBivariateSpline(y, x, self.rightImage)
             result = np.empty([m, n], dtype=np.uint8)
             for index in range(len(self.leftTriangles)):
-            # for index in range(10):
                 left = self.leftTriangles[index]
                 right = self.rightTriangles[index]
                 # get the target triangle
                 tar_vertice = left.vertices*(1-alpha)+right.vertices*alpha
                 tar_tri = Triangle(tar_vertice)
-                # print("left: ", left)
-                # print("right: ", right)
-                # print("target: ", tar_tri)
 
                 # get interpolation matrix on left and right images
                 H_left = getInterpolation(left, tar_tri)
@@ -154,19 +151,16 @@ class Morpher:
 
                 # get points of target triangle
                 points = tar_tri.getPoints()
-
-                # print("index: ", index)
-                # print("points: ", points)
                 for point in points:
-
                     a = np.reshape([point[0], point[1], 1], (3, 1))
                     b_left = np.matmul(H_left_inv, a)
                     b_right = np.matmul(H_right_inv, a)
 
-                    left_value = np.float64(f_left(b_left[0][0], b_left[1][0]))
-                    right_value = np.float64(f_right(b_right[0][0], b_right[1][0]))
+                    # left_value = np.float64(f_left(b_left[0][0], b_left[1][0]))
+                    # right_value = np.float64(f_right(b_right[0][0], b_right[1][0]))
+                    left_value = np.float64(f_left(b_left[1][0], b_left[0][0]))
+                    right_value = np.float64(f_right(b_right[1][0], b_right[0][0]))
                     result_value = np.uint8(np.round(left_value*(1-alpha) + right_value*alpha))
-
                     result[int(point[1])][int(point[0])] = result_value
             return result
 
