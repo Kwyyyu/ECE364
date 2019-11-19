@@ -11,6 +11,7 @@ import imageio
 import matplotlib
 from matplotlib.path import Path
 from scipy.spatial import Delaunay
+from scipy import interpolate
 
 
 def loadTriangles(leftPointFilePath, rightPointFilePath):
@@ -20,6 +21,7 @@ def loadTriangles(leftPointFilePath, rightPointFilePath):
         contents_right = f.readlines()
     left = []
     right = []
+    # get left and right point list
     for index in range(len(contents_left)):
         xl, yl = contents_left[index].split()
         xr, yr = contents_right[index].split()
@@ -27,17 +29,15 @@ def loadTriangles(leftPointFilePath, rightPointFilePath):
         right.append([xr, yr])
     l_nparr = np.array(left)
     r_nparr = np.array(right)
+    # get the delaunay triangle pairs on left image
     l_tri = Delaunay(l_nparr)
 
     tri_leftlist = []
     tri_rightlist = []
-    # print(l_nparr[l_tri.simplices])
-
+    # get all left and right triangles
     for index in range(len(l_nparr[l_tri.simplices])):
         l_pair = l_nparr[l_tri.simplices][index]
         r_pair = r_nparr[l_tri.simplices][index]
-        # print("left pair")
-        # print(l_pair)
         new_leftarray = np.array(l_pair, dtype=np.float64)
         new_lefttri = Triangle(new_leftarray)
         tri_leftlist.append(new_lefttri)
@@ -49,11 +49,9 @@ def loadTriangles(leftPointFilePath, rightPointFilePath):
     return tri_leftlist, tri_rightlist
 
 
-
 class Triangle:
     def __init__(self, vertices: np.array):
         if vertices.dtype is not np.dtype("float64"):
-            # print(vertices.dtype)
             raise ValueError("The arguments should be an array of float numbers.")
         if vertices.shape != (3, 2):
             raise ValueError("The argument should be a 3x2 array.")
@@ -66,31 +64,23 @@ class Triangle:
         # using matplotlib caontains_points function, slow, might need update
         path = Path(self.vertices)
         final_list = []
-        lx = np.round(min(self.vertices[0, 0], self.vertices[1, 0], self.vertices[2, 0]), 0)-1
+
+        # this way is about 10s faster than the previous one
         ux = np.ceil(max(self.vertices[0, 0], self.vertices[1, 0], self.vertices[2, 0]))
-        ly = np.round(min(self.vertices[0, 1], self.vertices[1, 1], self.vertices[2, 1]), 0)-1
         uy = np.ceil(max(self.vertices[0, 1], self.vertices[1, 1], self.vertices[2, 1]))
+        lx = np.round(min(self.vertices[0, 0], self.vertices[1, 0], self.vertices[2, 0]), 0) - 1
+        ly = np.round(min(self.vertices[0, 1], self.vertices[1, 1], self.vertices[2, 1]), 0) - 1
+        x, y = np.meshgrid(np.arange(lx, ux+1), np.arange(ly, uy+1))  # make a canvas with coordinates
+        x, y = x.flatten(), y.flatten()
+        points = np.vstack((x, y)).T
 
-        for i in range(int(lx), int(ux)+1):
-            for j in range(int(ly), int(uy)+1):
-                if path.contains_point([i, j], radius=0.05) is True:
-                    final_list.append([i, j])
+        # not sure whether to include the edge points or not
+        grid = path.contains_points(points, radius=0.05)
+
+        for index in range(len(grid)):
+            if grid[index] is np.bool_(True):
+                final_list.append(points[index])
         return np.array(final_list, dtype=np.float64)
-
-        # this way is about 10s slower than the previous one, pass
-        # ux = np.ceil(max(self.vertices[0, 0], self.vertices[1, 0], self.vertices[2, 0]))
-        # uy = np.ceil(max(self.vertices[0, 1], self.vertices[1, 1], self.vertices[2, 1]))
-        # x, y = np.meshgrid(np.arange(ux+1), np.arange(uy+1))  # make a canvas with coordinates
-        # x, y = x.flatten(), y.flatten()
-        # points = np.vstack((x, y)).T
-        #
-        # # not sure whether to include the edge points or not
-        # grid = path.contains_points(points, radius=0.05)
-        #
-        # for index in range(len(grid)):
-        #     if grid[index] is np.bool_(True):
-        #         final_list.append(points[index])
-        # return np.array(final_list, dtype=np.float64)
 
 
 def getInterpolation(origin, target):
@@ -130,8 +120,6 @@ class Morpher:
         self.rightImage = rightImage
         self.rightTriangles = rightTriangles
 
-
-
     def getImageAtAlpha(self, alpha: float):
         if alpha == 0:
             return self.leftImage
@@ -139,6 +127,13 @@ class Morpher:
             return self.rightImage
         else:
             m, n = self.leftImage.shape
+            # m: 1080 n: 1440 m is the row and n is the col
+            # print(m, n)
+            # x is col and y is row
+            x = np.arange(n)
+            y = np.arange(m)
+            f_left = interpolate.interp2d(x, y, self.leftImage)
+            f_right = interpolate.interp2d(x, y, self.rightImage)
             result = np.empty([m, n], dtype=np.uint8)
             for index in range(len(self.leftTriangles)):
             # for index in range(10):
@@ -159,21 +154,21 @@ class Morpher:
 
                 # get points of target triangle
                 points = tar_tri.getPoints()
-                # print(tar_tri)
+
+                # print("index: ", index)
+                # print("points: ", points)
                 for point in points:
-                    a = np.reshape([point[0], point[0], 1], (3, 1))
+
+                    a = np.reshape([point[0], point[1], 1], (3, 1))
                     b_left = np.matmul(H_left_inv, a)
                     b_right = np.matmul(H_right_inv, a)
 
-                    # need 2D interpolation to get the image value !!!!!!!
-                    # left_value = np.float64(self.leftImage[b_left[0][0]][b_left[1][0]])
-                    # right_value = np.float64(self.rightImage[b_right[0][0]][b_right[1][0]])
-                    # result_value = np.uint8(np.round(left_value*(1-alpha) + right_value*alpha))
-                    # result[point[0][0]][point[0][1]] = result_value
+                    left_value = np.float64(f_left(b_left[0][0], b_left[1][0]))
+                    right_value = np.float64(f_right(b_right[0][0], b_right[1][0]))
+                    result_value = np.uint8(np.round(left_value*(1-alpha) + right_value*alpha))
 
-
-
-
+                    result[int(point[1])][int(point[0])] = result_value
+            return result
 
 
 if __name__ == "__main__":
@@ -184,8 +179,11 @@ if __name__ == "__main__":
     rightpath = "./points.right.txt"
     leftTri, rightTri = loadTriangles(leftpath, rightpath)
     test = np.array([[1, 2], [5, 7], [0, 4]], dtype=np.uint8)
-    m = Morpher(test, leftTri, test, rightTri)
-    m.getImageAtAlpha(0.5)
+    left_image = imageio.imread('./LeftGray.png')
+    right_image = imageio.imread('./RightGray.png')
+    m1 = Morpher(left_image, leftTri, right_image, rightTri)
+    result = m1.getImageAtAlpha(0.5)
+    imageio.imwrite('./result.png', result)
     print("finish")
 
 
