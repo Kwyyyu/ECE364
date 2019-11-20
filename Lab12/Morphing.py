@@ -68,8 +68,8 @@ class Triangle:
         # this way is about 10s faster than the previous one
         ux = np.ceil(max(self.vertices[0, 0], self.vertices[1, 0], self.vertices[2, 0]))
         uy = np.ceil(max(self.vertices[0, 1], self.vertices[1, 1], self.vertices[2, 1]))
-        lx = np.round(min(self.vertices[0, 0], self.vertices[1, 0], self.vertices[2, 0]), 0) - 1
-        ly = np.round(min(self.vertices[0, 1], self.vertices[1, 1], self.vertices[2, 1]), 0) - 1
+        lx = np.ceil(min(self.vertices[0, 0], self.vertices[1, 0], self.vertices[2, 0]))
+        ly = np.ceil(min(self.vertices[0, 1], self.vertices[1, 1], self.vertices[2, 1]))
         x, y = np.meshgrid(np.arange(lx, ux+1), np.arange(ly, uy+1))  # make a canvas with coordinates
         x, y = x.flatten(), y.flatten()
         points = np.vstack((x, y)).T
@@ -77,29 +77,39 @@ class Triangle:
         # not sure whether to include the edge points or not
         grid = path.contains_points(points, radius=0.05)
 
-        for index in range(len(grid)):
-            if grid[index] is np.bool_(True):
-                final_list.append(points[index])
+        # for index in range(len(grid)):
+        #     if grid[index] is np.bool_(True):
+        #         final_list.append(points[index])
+        index_list = list(filter(lambda i: grid[i] is np.bool_(True), range(len(grid))))
+        final_list = points[index_list]
         return np.array(final_list, dtype=np.float64)
 
 
 def getInterpolation(origin, target):
-    A1 = [origin.vertices[0][0], origin.vertices[0][1], 1, 0, 0, 0,
-          0, 0, 0, origin.vertices[0][0], origin.vertices[0][1], 1]
-    A2 = [origin.vertices[1][0], origin.vertices[1][1], 1, 0, 0, 0,
-          0, 0, 0, origin.vertices[1][0], origin.vertices[1][1], 1]
-    A3 = [origin.vertices[2][0], origin.vertices[2][1], 1, 0, 0, 0,
-          0, 0, 0, origin.vertices[2][0], origin.vertices[2][1], 1]
-    A = np.reshape([A1, A2, A3], (6, 6))
-    # print(A)
-    # print()
-    b = [target.vertices[0][0], target.vertices[0][1], target.vertices[1][0], target.vertices[1][1],
-         target.vertices[2][0], target.vertices[2][1]]
-    B = np.reshape(b, (6, 1))
-    # print(B)
-    # print()
+    # A1 = [origin.vertices[0][0], origin.vertices[0][1], 1, 0, 0, 0,
+    #       0, 0, 0, origin.vertices[0][0], origin.vertices[0][1], 1]
+    # A2 = [origin.vertices[1][0], origin.vertices[1][1], 1, 0, 0, 0,
+    #       0, 0, 0, origin.vertices[1][0], origin.vertices[1][1], 1]
+    # A3 = [origin.vertices[2][0], origin.vertices[2][1], 1, 0, 0, 0,
+    #       0, 0, 0, origin.vertices[2][0], origin.vertices[2][1], 1]
+    A = [[origin.vertices[0][0], origin.vertices[0][1], 1, 0, 0, 0],
+                  [0, 0, 0, origin.vertices[0][0], origin.vertices[0][1], 1],
+                  [origin.vertices[1][0], origin.vertices[1][1], 1, 0, 0, 0],
+                  [0, 0, 0, origin.vertices[1][0], origin.vertices[1][1], 1],
+                  [origin.vertices[2][0], origin.vertices[2][1], 1, 0, 0, 0],
+                  [0, 0, 0, origin.vertices[2][0], origin.vertices[2][1], 1]]
+
+    B = [[target.vertices[0][0]],
+         [target.vertices[0][1]],
+         [target.vertices[1][0]],
+         [target.vertices[1][1]],
+         [target.vertices[2][0]],
+         [target.vertices[2][1]]]
+
     h = np.linalg.solve(A, B)
-    H = np.reshape([h[0][0], h[1][0], h[2][0], h[3][0], h[4][0], h[5][0], 0, 0, 1], (3, 3))
+    H = [[h[0][0], h[1][0], h[2][0]],
+         [h[3][0], h[4][0], h[5][0]],
+         [0, 0, 1]]
     return H
 
 
@@ -125,6 +135,8 @@ class Morpher:
             return self.leftImage
         elif alpha == 1:
             return self.rightImage
+        elif alpha > 1 or alpha < 0:
+            raise ValueError("Alpha should be in range of 0 and 1.")
         else:
             m, n = self.leftImage.shape
             # m: 1080 n: 1440 m is the row and n is the col
@@ -136,9 +148,7 @@ class Morpher:
             f_left = interpolate.RectBivariateSpline(y, x, self.leftImage)
             f_right = interpolate.RectBivariateSpline(y, x, self.rightImage)
             result = np.empty([m, n], dtype=np.uint8)
-            for index in range(len(self.leftTriangles)):
-                left = self.leftTriangles[index]
-                right = self.rightTriangles[index]
+            for left, right in zip(self.leftTriangles, self.rightTriangles):
                 # get the target triangle
                 tar_vertice = left.vertices*(1-alpha)+right.vertices*alpha
                 tar_tri = Triangle(tar_vertice)
@@ -152,7 +162,9 @@ class Morpher:
                 # get points of target triangle
                 points = tar_tri.getPoints()
                 for point in points:
-                    a = np.reshape([point[0], point[1], 1], (3, 1))
+                    a = np.array([[point[0]],
+                                  [point[1]],
+                                  [1]])
                     b_left = np.matmul(H_left_inv, a)
                     b_right = np.matmul(H_right_inv, a)
 
@@ -160,7 +172,8 @@ class Morpher:
                     # right_value = np.float64(f_right(b_right[0][0], b_right[1][0]))
                     left_value = np.float64(f_left(b_left[1][0], b_left[0][0]))
                     right_value = np.float64(f_right(b_right[1][0], b_right[0][0]))
-                    result_value = np.uint8(np.round(left_value*(1-alpha) + right_value*alpha))
+                    # result_value = np.uint8(np.round(left_value*(1-alpha) + right_value*alpha))
+                    result_value = np.uint8(left_value * (1 - alpha) + right_value * alpha)
                     result[int(point[1])][int(point[0])] = result_value
             return result
 
@@ -172,7 +185,7 @@ if __name__ == "__main__":
     leftpath = "./points.left.txt"
     rightpath = "./points.right.txt"
     leftTri, rightTri = loadTriangles(leftpath, rightpath)
-    test = np.array([[1, 2], [5, 7], [0, 4]], dtype=np.uint8)
+
     left_image = imageio.imread('./LeftGray.png')
     right_image = imageio.imread('./RightGray.png')
     m1 = Morpher(left_image, leftTri, right_image, rightTri)
