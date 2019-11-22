@@ -1,0 +1,57 @@
+/home/ecegridfs/a/ee364ta/grading/Lab09/ee364e08
+
+500.0
+190.0
+500.0
+83545-99452 500.0
+93445-12424 500.0
+24293-80620 500.0
+52357-54349 500.0
+95658-86799 500.0
+01524-65380 500.0
+44921-58069 500.0
+81782-21568 500.0
+44471-18426 500.0
+09312-94888 500.0
+70615-99374 500.0
+04634-37226 500.0
+69069-29232 500.0
+23694-74441 500.0
+15840-81914 500.0
+15821-95120 500.0
+04025-42834 500.0
+----------------------------------------------------------------------------------
+FUNCTION               | DESCRIPTION        | COMMENTS                 | POINTS  
+----------------------------------------------------------------------------------
+Account                  Account String 1     Passed                     2/2     
+Account                  Account String 2     Passed                     2/2     
+Account                  Attribute Check      Passed                     3/3     
+Account_performAction    Deposit Check        Passed                     2/2     
+Account_performAction    Withdraw Check 1     Passed                     2/2     
+Account_performAction    Withdraw Check 2     Passed                     2/2     
+Account_performAction    Withdraw Check 3     Passed                     2/2     
+Action                   Normal               Passed                     3/3     
+Action                   Wrong Amount         Passed                     2/2     
+Client                   Client String        Passed                     2/2     
+Client                   Normal               Passed                     3/3     
+DataPattern              JSON 1               FAILED                     0/5     
+DataPattern              JSON 2               FAILED                     0/5     
+Institute                Action on Missing    Error running function     0/3     
+Institute                Add Existing         Error running function     0/3     
+Institute                Add New              Error running function     0/3     
+Institute                Withdraw Check 1     Error running function     0/3     
+Institute                Withdraw Check 2     Error running function     0/3     
+InstituteLoading         Amount Check 1       Error running function     0/3     
+InstituteLoading         Amount Check 2       Error running function     0/3     
+InstituteLoading         Count Check          Error running function     0/4     
+getLinkPattern           Invalid 1            FAILED                     0/2     
+getLinkPattern           Invalid 2            FAILED                     0/2     
+getLinkPattern           Valid 1              Passed                     2/2     
+getLinkPattern           Valid 2              Passed                     2/2     
+getLinkPattern           Valid 3              Passed                     2/2     
+getNumberPattern         test combination     FAILED                     0/4     
+getNumberPattern         test floats          FAILED                     0/3     
+getNumberPattern         test scientific      FAILED                     0/3     
+----------------------------------------------------------------------------------
+
+Total Score = 31.0
