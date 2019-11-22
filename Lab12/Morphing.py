@@ -51,6 +51,8 @@ def loadTriangles(leftPointFilePath, rightPointFilePath):
 
 class Triangle:
     def __init__(self, vertices: np.array):
+        if not isinstance(vertices, np.ndarray):
+            raise ValueError("The argument should be a numpy array.")
         if vertices.dtype is not np.dtype("float64"):
             raise ValueError("The arguments should be an array of float numbers.")
         if vertices.shape != (3, 2):
@@ -181,12 +183,19 @@ if __name__ == "__main__":
     leftpath = "./points.left.txt"
     rightpath = "./points.right.txt"
     leftTri, rightTri = loadTriangles(leftpath, rightpath)
+    #
+    # left_image = imageio.imread('./LeftGray.png')
+    # right_image = imageio.imread('./RightGray.png')
+    # m1 = Morpher(left_image, leftTri, right_image, rightTri)
+    # result = m1.getImageAtAlpha(0.75)
+    # imageio.imwrite('./result.png', result)
 
-    left_image = imageio.imread('./LeftGray.png')
-    right_image = imageio.imread('./RightGray.png')
-    m1 = Morpher(left_image, leftTri, right_image, rightTri)
-    result = m1.getImageAtAlpha(0.5)
-    imageio.imwrite('./result.png', result)
+    test = np.array([[1,1], [2,2], [3,3]], dtype=np.float64)
+    test2 = list([1, 2, 3])
+    print(type(test))
+
+    if not isinstance(test2, np.ndarray):
+        print("wrong")
 
     print("finish")
 
