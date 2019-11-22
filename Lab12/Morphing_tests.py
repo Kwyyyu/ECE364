@@ -1,7 +1,7 @@
 import unittest
+import os
 from imageio import imread as libread
 
-from MorphingUtility import *
 from Morphing import *
 
 TestFolder = "TestData"
@@ -12,7 +12,7 @@ def imread(filePath):
     return np.array(startImage)
 
 
-class MorphingTestSuite(unittest.TestCase, ImageAssertion):
+class MorphingTestSuite(unittest.TestCase):
 
     def test_loadTriangle(self):
 
