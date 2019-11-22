@@ -161,27 +161,23 @@ class Morpher:
 
                 # get points of target triangle
                 points = tar_tri.getPoints()
-                for point in points:
-                    a = np.array([[point[0]],
-                                  [point[1]],
-                                  [1]])
-                    b_left = np.matmul(H_left_inv, a)
-                    b_right = np.matmul(H_right_inv, a)
+                extra = np.ones((points.shape[0], 1))
+                a = np.hstack((points, extra)).transpose()
 
-                    # left_value = np.float64(f_left(b_left[0][0], b_left[1][0]))
-                    # right_value = np.float64(f_right(b_right[0][0], b_right[1][0]))
-                    left_value = np.float64(f_left(b_left[1][0], b_left[0][0]))
-                    right_value = np.float64(f_right(b_right[1][0], b_right[0][0]))
-                    # result_value = np.uint8(np.round(left_value*(1-alpha) + right_value*alpha))
-                    result_value = np.uint8(left_value * (1 - alpha) + right_value * alpha)
-                    result[int(point[1])][int(point[0])] = result_value
+                b_left = np.matmul(H_left_inv, a)
+                b_right = np.matmul(H_right_inv, a)
+
+                left_value = f_left(b_left[1], b_left[0], grid=False)
+                right_value = f_right(b_right[1], b_right[0], grid=False)
+                result_value = np.uint8(left_value * (1 - alpha) + right_value * alpha)
+
+                for index in range(len(points)):
+                    result[int(points[index][1]), int(points[index][0])] = result_value[index]
             return result
 
 
 if __name__ == "__main__":
-    # vertice = np.array([[1, 2], [5, 7], [0, 4]], dtype=np.float64)
-    # t1 = Triangle(vertice)
-    # print(t1.getPoints())
+
     leftpath = "./points.left.txt"
     rightpath = "./points.right.txt"
     leftTri, rightTri = loadTriangles(leftpath, rightpath)
@@ -191,6 +187,7 @@ if __name__ == "__main__":
     m1 = Morpher(left_image, leftTri, right_image, rightTri)
     result = m1.getImageAtAlpha(0.5)
     imageio.imwrite('./result.png', result)
+
     print("finish")
 
 
