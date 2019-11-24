@@ -12,6 +12,8 @@ import matplotlib
 from matplotlib.path import Path
 from scipy.spatial import Delaunay
 from scipy import interpolate
+import os
+import shutil
 
 
 def loadTriangles(leftPointFilePath, rightPointFilePath):
@@ -177,25 +179,57 @@ class Morpher:
                     result[int(points[index][1]), int(points[index][0])] = result_value[index]
             return result
 
+    def saveVideo(self, targetFilePath: str, frameCount: int, frameRate: int, includeReversed=True):
+        if targetFilePath[len(targetFilePath)-4:len(targetFilePath)] != ".mp4":
+            raise ValueError('Wrong file path! Should have an extension of ".mp4".')
+        if (not isinstance(frameCount, int)) or frameCount < 10:
+            raise ValueError("FrameCount should be an integer larger than or equal to 10.")
+        if (not isinstance(frameRate, int)) or frameCount < 5:
+            raise ValueError("FrameRate should be an integer larger than or equal to 5.")
+        if not isinstance(includeReversed, bool):
+            raise TypeError("IncludeReverse should be a boolean variable.")
+
+        alpha_list = np.arange(0, 1, 1.0/(frameCount-1))
+        alpha_list = np.append(alpha_list, [1.0])
+        index = 1
+        if os.path.isdir("./temp/"):
+            shutil.rmtree("./temp")
+        os.mkdir("./temp")
+        result_list = []
+        for alpha in alpha_list:
+            result = self.getImageAtAlpha(alpha)
+            result_list.append(result)
+            index_new = "%03d" % index
+            path = "./temp/result_" + index_new + ".png"
+            imageio.imwrite(path, result)
+            index += 1
+        if includeReversed:
+            result_list.reverse()
+            for result in result_list:
+                index_new = "%03d" % index
+                path = "./temp/result_" + index_new + ".png"
+                imageio.imwrite(path, result)
+                index += 1
+
+        command = "ffmpeg -framerate " + str(frameRate) + " -i ./temp/result_%03d.png " + targetFilePath
+        os.system(command)
+        shutil.rmtree("./temp")
+
 
 if __name__ == "__main__":
 
     leftpath = "./points.left.txt"
     rightpath = "./points.right.txt"
     leftTri, rightTri = loadTriangles(leftpath, rightpath)
-    #
-    # left_image = imageio.imread('./LeftGray.png')
-    # right_image = imageio.imread('./RightGray.png')
-    # m1 = Morpher(left_image, leftTri, right_image, rightTri)
+
+    left_image = imageio.imread('./LeftGray.png')
+    right_image = imageio.imread('./RightGray.png')
+    m1 = Morpher(left_image, leftTri, right_image, rightTri)
     # result = m1.getImageAtAlpha(0.75)
     # imageio.imwrite('./result.png', result)
 
-    test = np.array([[1,1], [2,2], [3,3]], dtype=np.float64)
-    test2 = list([1, 2, 3])
-    print(type(test))
+    m1.saveVideo("./rv.mp4", 11, 5, True)
 
-    if not isinstance(test2, np.ndarray):
-        print("wrong")
 
     print("finish")
 
