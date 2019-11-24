@@ -70,6 +70,7 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
             self.lineEdit_alpha.setDisabled(False)
             self.Slider.setDisabled(False)
             self.lineEdit_alpha.setText("0.0")
+            self.lineEdit_alpha.setReadOnly(True)
 
     def blend(self):
         leftTriangle, rightTriangle = loadTriangles(self.leftPath, self.rightPath)
@@ -87,6 +88,5 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     currentApp = QApplication(sys.argv)
     currentForm = MorphingApp()
-
     currentForm.show()
     sys.exit(currentApp.exec_())
