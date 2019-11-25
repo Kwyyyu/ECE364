@@ -50,6 +50,9 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
         self.leftPath = filePath + ".txt"
         # print(self.leftImage)
         self.tbsStart.setText("test on left")
+        self.tbsStart.set
+        # pixmap = QtGui.QPixmap(filePath)
+        # self.tbsStart.show(pixmap)
 
     def loadRightData(self):
         filePath, _ = QFileDialog.getOpenFileName(self, caption='Open image file ...',
@@ -71,6 +74,7 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
             self.Slider.setDisabled(False)
             self.lineEdit_alpha.setText("0.0")
             self.lineEdit_alpha.setReadOnly(True)
+            self.Slider.setValue(0)
 
     def blend(self):
         leftTriangle, rightTriangle = loadTriangles(self.leftPath, self.rightPath)
