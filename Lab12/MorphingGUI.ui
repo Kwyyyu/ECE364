@@ -33,16 +33,6 @@
      <string>Ending Image</string>
     </property>
    </widget>
-   <widget class="QTextBrowser" name="tbsStart">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>40</y>
-      <width>288</width>
-      <height>216</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_alpha">
     <property name="geometry">
      <rect>
@@ -50,16 +40,6 @@
       <y>300</y>
       <width>51</width>
       <height>27</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QTextBrowser" name="tbsResult">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>330</y>
-      <width>288</width>
-      <height>216</height>
      </rect>
     </property>
    </widget>
@@ -80,16 +60,6 @@
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QTextBrowser" name="tbsEnding">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>40</y>
-      <width>288</width>
-      <height>216</height>
-     </rect>
     </property>
    </widget>
    <widget class="QLabel" name="label_1">
@@ -219,6 +189,36 @@
     </property>
     <property name="text">
      <string>Blend</string>
+    </property>
+   </widget>
+   <widget class="QGraphicsView" name="gpvStart">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>40</y>
+      <width>288</width>
+      <height>216</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QGraphicsView" name="gpvEnding">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>40</y>
+      <width>288</width>
+      <height>216</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QGraphicsView" name="gpvResult">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>330</y>
+      <width>288</width>
+      <height>216</height>
+     </rect>
     </property>
    </widget>
   </widget>
