@@ -10,11 +10,12 @@ import sys
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen, QBrush
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QGraphicsScene, QGraphicsLineItem
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem
 from MorphingGUI import *
 from Morphing import *
 import re
 import imageio
+import os
 
 class MorphingApp(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -28,7 +29,13 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
         self.alpha = 0.0
         self.leftScene = QGraphicsScene()
         self.rightScene = QGraphicsScene()
-        self.lines = []
+        self.leftlines = []
+        self.rightlines = []
+        self.tempLeft = []
+        self.leftFlag = 0
+        self.tempRight = []
+        self.rightFlag = 0
+        self.tempPair = [[0, 0], [0, 0]]
 
         self.btnBlend.setDisabled(True)
         self.chbShow.setDisabled(True)
@@ -46,8 +53,42 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
         self.Slider.setMinimum(0)
         self.Slider.setMaximum(20)
         self.Slider.setSingleStep(1)
+        self.Slider.setPageStep(1)
         self.Slider.valueChanged.connect(self.slider_value_change)
-        self.chbShow.clicked.connect(self.addTriangles)
+        self.chbShow.clicked.connect(self.showTriangles)
+        self.gpvStart.mousePressEvent = self.selectLeftPoints
+        self.gpvStart.keyPressEvent = self.deleteLeftPoints
+        self.gpvEnding.mousePressEvent = self.selectRightPoints
+        self.gpvEnding.keyPressEvent = self.deleteRightPoints
+        self.mousePressEvent = self.setPersist
+
+    def setPersist(self, event):
+        if self.leftFlag == 1 and self.rightFlag == 1:
+            x = event.x()
+            y = event.y()
+            if self.gpvEnding.x() <= x <= self.gpvEnding.x()+self.gpvEnding.width() and self.gpvEnding.y() <= y <= self.gpvEnding.y()+self.gpvEnding.height():
+                pass
+            else:
+                self.leftFlag = 0
+                self.rightFlag = 0
+                pen = QPen(Qt.blue)
+                brush = QBrush(Qt.blue)
+                temp_item = self.tempLeft[len(self.tempLeft)-1]
+                self.leftScene.removeItem(temp_item)
+                temp_item.setPen(pen)
+                temp_item.setBrush(brush)
+                self.leftScene.addItem(temp_item)
+                line_new = '\n%8.1f%8.1f' % (self.tempPair[0][0]*5, self.tempPair[0][1]*5)
+                with open(self.leftPath, "a") as f:
+                    f.write(line_new)
+                temp_item = self.tempRight[len(self.tempRight) - 1]
+                self.rightScene.removeItem(temp_item)
+                temp_item.setPen(pen)
+                temp_item.setBrush(brush)
+                self.rightScene.addItem(temp_item)
+                line_new = '\n%8.1f%8.1f' % (self.tempPair[1][0] * 5, self.tempPair[1][1] * 5)
+                with open(self.rightPath, "a") as f:
+                    f.write(line_new)
 
     def getPointList(self, filepath):
         with open(filepath, "r") as f:
@@ -66,33 +107,53 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
         pen.setColor(Qt.red)
         brush.setStyle(Qt.SolidPattern)
         brush.setColor(Qt.red)
-        # print(points)
 
         for point in points:
             x, y = point
-            # print(x, y)
             scene.addEllipse(float(x)/5 - 3, float(y)/5 - 3, 3.0, 3.0, pen, brush)
         return scene
 
     def addTriangles(self):
         leftTriangle, rightTriangle = loadTriangles(self.leftPath, self.rightPath)
+        pen = QPen()
+        if len(self.tempLeft) == 0:
+            pen.setColor(Qt.red)
+        else:
+            pen.setColor(Qt.cyan)
+        pen.setStyle(Qt.SolidLine)
         for l_tri, r_tri in zip(leftTriangle, rightTriangle):
             l = np.divide(l_tri.vertices, 5)
             r = np.divide(r_tri.vertices, 5)
             # print(l[0])
             # print(r)
-            pen = QPen()
-            pen.setColor(Qt.red)
-            pen.setStyle(Qt.SolidLine)
 
-            self.lines.append(QGraphicsLineItem(l[0][0], l[0][1], l[1][0], l[1][1], pen))
-            
-            # self.leftScene.addLine(l[0][0], l[0][1], l[2][0], l[2][1], pen)
-            # self.leftScene.addLine(l[2][0], l[2][1], l[1][0], l[1][1], pen)
-            #
-            # self.rightScene.addLine(r[0][0], r[0][1], r[1][0], r[1][1], pen)
-            # self.rightScene.addLine(r[0][0], r[0][1], r[2][0], r[2][1], pen)
-            # self.rightScene.addLine(r[2][0], r[2][1], r[1][0], r[1][1], pen)
+            self.leftlines.append(QGraphicsLineItem(l[0][0], l[0][1], l[1][0], l[1][1]))
+            self.leftlines.append(QGraphicsLineItem(l[0][0], l[0][1], l[2][0], l[2][1]))
+            self.leftlines.append(QGraphicsLineItem(l[2][0], l[2][1], l[1][0], l[1][1]))
+
+            self.rightlines.append(QGraphicsLineItem(r[0][0], r[0][1], r[1][0], r[1][1]))
+            self.rightlines.append(QGraphicsLineItem(r[0][0], r[0][1], r[2][0], r[2][1]))
+            self.rightlines.append(QGraphicsLineItem(r[2][0], r[2][1], r[1][0], r[1][1]))
+
+        for lline,rline in zip(self.leftlines, self.rightlines):
+            lline.setPen(pen)
+            rline.setPen(pen)
+            self.leftScene.addItem(lline)
+            self.rightScene.addItem(rline)
+
+    def removeTriangles(self):
+        for line in self.leftlines:
+            self.leftScene.removeItem(line)
+        for line in self.rightlines:
+            self.rightScene.removeItem(line)
+        pass
+
+    def showTriangles(self):
+        if os.path.isfile(self.leftPath) and os.path.isfile(self.rightPath):
+            if self.chbShow.isChecked():
+                self.addTriangles()
+            else:
+                self.removeTriangles()
 
     def loadLeftData(self):
         filePath, _ = QFileDialog.getOpenFileName(self, caption='Open image file ...',
@@ -108,10 +169,12 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
         self.leftScene.addPixmap(image)
 
         # get all the points for left image
-        self.leftPoionts = self.getPointList(self.leftPath)
-        self.leftScene = self.addPoints(self.leftPoionts, self.leftScene)
+        if os.path.isfile(self.leftPath):
+            self.leftPoionts = self.getPointList(self.leftPath)
+            self.leftScene = self.addPoints(self.leftPoionts, self.leftScene)
 
         self.gpvStart.setScene(self.leftScene)
+
         if self.leftPath is not None and self.rightPath is not None:
             self.dataEntry()
 
@@ -129,12 +192,86 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
         self.rightScene.addPixmap(image)
 
         # get all the points for right image
-        self.rightPoionts = self.getPointList(self.rightPath)
-        self.rightScene = self.addPoints(self.rightPoionts, self.rightScene)
+        if os.path.isfile(self.rightPath):
+            self.rightPoionts = self.getPointList(self.rightPath)
+            self.rightScene = self.addPoints(self.rightPoionts, self.rightScene)
 
         self.gpvEnding.setScene(self.rightScene)
         if self.leftPath is not None and self.rightPath is not None:
             self.dataEntry()
+
+    def selectLeftPoints(self, event):
+        if self.leftFlag == 1 and self.rightFlag == 1:
+            self.leftFlag = 0
+            self.rightFlag = 0
+            pen = QPen(Qt.blue)
+            brush = QBrush(Qt.blue)
+            temp_item = self.tempLeft[len(self.tempLeft)-1]
+            self.leftScene.removeItem(temp_item)
+            temp_item.setPen(pen)
+            temp_item.setBrush(brush)
+            self.leftScene.addItem(temp_item)
+            line_new = '\n%8.1f%8.1f' % (self.tempPair[0][0]*5, self.tempPair[0][1]*5)
+            with open(self.leftPath, "a") as f:
+                f.write(line_new)
+            temp_item = self.tempRight[len(self.tempRight) - 1]
+            self.rightScene.removeItem(temp_item)
+            temp_item.setPen(pen)
+            temp_item.setBrush(brush)
+            self.rightScene.addItem(temp_item)
+            line_new = '\n%8.1f%8.1f' % (self.tempPair[1][0] * 5, self.tempPair[1][1] * 5)
+            with open(self.rightPath, "a") as f:
+                f.write(line_new)
+
+        if (not os.path.isfile(self.leftPath)) and (not os.path.isfile(self.rightPath)):
+            with open(self.leftPath, "w"): pass
+            with open(self.rightPath, "w"): pass
+        pen = QPen(Qt.green)
+        brush = QBrush(Qt.green)
+
+        if self.leftFlag == 0:
+            x = event.x()
+            y = event.y()
+            temp_item = QGraphicsEllipseItem(x - 3, y - 3, 3, 3)
+            temp_item.setPen(pen)
+            temp_item.setBrush(brush)
+            self.tempLeft.append(temp_item)
+            self.leftScene.addItem(temp_item)
+            self.leftFlag = 1
+            self.tempPair[0] = [x, y]
+            print(self.tempPair)
+
+    def deleteLeftPoints(self, event):
+        if event.key() == Qt.Key_Backspace and self.leftFlag == 1:
+            temp_item = self.tempLeft.pop()
+            self.leftScene.removeItem(temp_item)
+            self.leftFlag = 0
+
+    def selectRightPoints(self, event):
+        if (not os.path.isfile(self.leftPath)) and (not os.path.isfile(self.rightPath)):
+            with open(self.leftPath, "w"): pass
+            with open(self.rightPath, "w"): pass
+        pen = QPen(Qt.green)
+        brush = QBrush(Qt.green)
+
+        if self.rightFlag == 0:
+            x = event.x()
+            y = event.y()
+            temp_item = QGraphicsEllipseItem(x - 3, y - 3, 3, 3)
+            temp_item.setPen(pen)
+            temp_item.setBrush(brush)
+            self.tempRight.append(temp_item)
+            self.rightScene.addItem(temp_item)
+            self.rightFlag = 1
+            self.tempPair[1] = [x, y]
+            print(self.tempPair)
+
+    def deleteRightPoints(self, event):
+        if event.key() == Qt.Key_Backspace and self.rightFlag == 1:
+            temp_item = self.tempRight.pop()
+            self.rightScene.removeItem(temp_item)
+            self.rightFlag = 0
+
 
     def dataEntry(self):
         if self.leftPath and self.rightPath:
@@ -161,7 +298,6 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
 
     def slider_value_change(self, value):
         self.alpha = value*0.05
-        # self.lineEdit_alpha.setText("%.2f" % (value*0.05))
         self.lineEdit_alpha.setText(str(round(value * 0.05, 2)))
 
 
