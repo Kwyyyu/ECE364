@@ -89,6 +89,9 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
                 line_new = '\n%8.1f%8.1f' % (self.tempPair[1][0] * 5, self.tempPair[1][1] * 5)
                 with open(self.rightPath, "a") as f:
                     f.write(line_new)
+                if self.chbShow.isChecked():
+                    self.removeTriangles()
+                    self.addTriangles()
 
     def getPointList(self, filepath):
         with open(filepath, "r") as f:
@@ -222,6 +225,9 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
             line_new = '\n%8.1f%8.1f' % (self.tempPair[1][0] * 5, self.tempPair[1][1] * 5)
             with open(self.rightPath, "a") as f:
                 f.write(line_new)
+            if self.chbShow.isChecked():
+                self.removeTriangles()
+                self.addTriangles()
 
         if (not os.path.isfile(self.leftPath)) and (not os.path.isfile(self.rightPath)):
             with open(self.leftPath, "w"): pass
