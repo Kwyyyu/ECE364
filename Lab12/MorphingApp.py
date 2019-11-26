@@ -101,8 +101,9 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
         point_list = []
         # get left and right point list
         for index in range(len(contents)):
-            xl, yl = contents[index].split()
-            point_list.append([xl, yl])
+            if contents[index] != "\n":
+                xl, yl = contents[index].split()
+                point_list.append([xl, yl])
         return point_list
 
     def addPoints(self, points, scene):
@@ -120,6 +121,7 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
     def addTriangles(self):
         leftTriangle, rightTriangle = loadTriangles(self.leftPath, self.rightPath)
         pen = QPen()
+        print("delauney: ", leftTriangle)
         if len(self.tempLeft) == 0:
             pen.setColor(Qt.red)
         else:
@@ -148,13 +150,18 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
     def removeTriangles(self):
         for line in self.leftlines:
             self.leftScene.removeItem(line)
+            self.leftlines = []
         for line in self.rightlines:
             self.rightScene.removeItem(line)
+            self.rightlines = []
         pass
 
     def showTriangles(self):
         if os.path.isfile(self.leftPath) and os.path.isfile(self.rightPath):
             if self.chbShow.isChecked():
+                print("path check:")
+                print(self.leftPath)
+                print(self.rightPath)
                 self.addTriangles()
             else:
                 self.removeTriangles()
@@ -168,7 +175,7 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
         self.leftImage = imageio.imread(filePath)
         self.leftPath = filePath + ".txt"
         rect = QtCore.QRect(self.gpvStart.x(), self.gpvStart.y(), self.gpvStart.width(), self.gpvStart.height())
-        self.leftScene.setSceneRect(0,0, rect.width(), rect.height())
+        self.leftScene.setSceneRect(0, 0, rect.width(), rect.height())
         image = QtGui.QPixmap(filePath).scaled(self.gpvStart.size()*0.995, QtCore.Qt.IgnoreAspectRatio, QtCore.Qt.SmoothTransformation)
         self.leftScene.addPixmap(image)
 

@@ -25,10 +25,11 @@ def loadTriangles(leftPointFilePath, rightPointFilePath):
     right = []
     # get left and right point list
     for index in range(len(contents_left)):
-        xl, yl = contents_left[index].split()
-        xr, yr = contents_right[index].split()
-        left.append([xl, yl])
-        right.append([xr, yr])
+        if contents_left[index] != "\n" and contents_right[index] != "\n":
+            xl, yl = contents_left[index].split()
+            xr, yr = contents_right[index].split()
+            left.append([xl, yl])
+            right.append([xr, yr])
     l_nparr = np.array(left)
     r_nparr = np.array(right)
     # get the delaunay triangle pairs on left image
