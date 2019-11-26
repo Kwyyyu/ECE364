@@ -54,6 +54,7 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
         self.Slider.setMaximum(20)
         self.Slider.setSingleStep(1)
         self.Slider.setPageStep(1)
+        self.Slider.setTickPosition(2)
         self.Slider.valueChanged.connect(self.slider_value_change)
         self.chbShow.clicked.connect(self.showTriangles)
         self.gpvStart.mousePressEvent = self.selectLeftPoints
