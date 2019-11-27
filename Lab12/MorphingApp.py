@@ -121,7 +121,6 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
     def addTriangles(self):
         leftTriangle, rightTriangle = loadTriangles(self.leftPath, self.rightPath)
         pen = QPen()
-        print("delauney: ", leftTriangle)
         if len(self.tempLeft) == 0:
             pen.setColor(Qt.red)
         else:
@@ -130,8 +129,6 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
         for l_tri, r_tri in zip(leftTriangle, rightTriangle):
             l = np.divide(l_tri.vertices, 5)
             r = np.divide(r_tri.vertices, 5)
-            # print(l[0])
-            # print(r)
 
             self.leftlines.append(QGraphicsLineItem(l[0][0], l[0][1], l[1][0], l[1][1]))
             self.leftlines.append(QGraphicsLineItem(l[0][0], l[0][1], l[2][0], l[2][1]))
@@ -159,9 +156,6 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
     def showTriangles(self):
         if os.path.isfile(self.leftPath) and os.path.isfile(self.rightPath):
             if self.chbShow.isChecked():
-                print("path check:")
-                print(self.leftPath)
-                print(self.rightPath)
                 self.addTriangles()
             else:
                 self.removeTriangles()
@@ -185,6 +179,9 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
             self.leftScene = self.addPoints(self.leftPoionts, self.leftScene)
 
         self.gpvStart.setScene(self.leftScene)
+        self.gpvResult.setScene(None)
+        self.chbShow.setChecked(False)
+        self.removeTriangles()
 
         if self.leftPath is not None and self.rightPath is not None:
             self.dataEntry()
@@ -208,6 +205,9 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
             self.rightScene = self.addPoints(self.rightPoionts, self.rightScene)
 
         self.gpvEnding.setScene(self.rightScene)
+        self.gpvResult.setScene(None)
+        self.chbShow.setChecked(False)
+        self.removeTriangles()
         if self.leftPath is not None and self.rightPath is not None:
             self.dataEntry()
 
@@ -253,7 +253,6 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
             self.leftScene.addItem(temp_item)
             self.leftFlag = 1
             self.tempPair[0] = [x, y]
-            print(self.tempPair)
 
     def deleteLeftPoints(self, event):
         if event.key() == Qt.Key_Backspace and self.leftFlag == 1:
@@ -278,7 +277,6 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
             self.rightScene.addItem(temp_item)
             self.rightFlag = 1
             self.tempPair[1] = [x, y]
-            print(self.tempPair)
 
     def deleteRightPoints(self, event):
         if event.key() == Qt.Key_Backspace and self.rightFlag == 1:
@@ -289,7 +287,6 @@ class MorphingApp(QMainWindow, Ui_MainWindow):
 
     def dataEntry(self):
         if self.leftPath and self.rightPath:
-            print("enable everything")
             self.btnBlend.setDisabled(False)
             self.chbShow.setDisabled(False)
             self.lineEdit_alpha.setDisabled(False)
